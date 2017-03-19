@@ -39,15 +39,15 @@ export class AuthComponent implements OnInit {
   }
 
   signInWithGoogle() {
-    console.log('Google');
+    this.auth.login('Google');
   }
 
   signInWithEmail(email, password) {
-    console.log(email, password);
+    this.auth.login(email, password);
   }
 
   signOut() {
-    console.log('sign out');
+    this.auth.logout();
   }
 
 }
