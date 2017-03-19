@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { AuthComponent } from './auth/auth.component';
 import { NotificationsComponent } from './notifications/notifications.component';
+import { RecipesComponent } from './recipes/recipes.component';
 
 const routes: Routes = [
   {
@@ -11,6 +12,10 @@ const routes: Routes = [
   {
     path: 'notifications',
     component: NotificationsComponent
+  },
+  {
+    path: 'recipes',
+    component: RecipesComponent
   },
 ];
 
