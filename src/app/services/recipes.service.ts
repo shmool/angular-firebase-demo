@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { AngularFire } from 'angularfire2';
 
 interface Ingredient {
   name: string,
@@ -11,25 +12,40 @@ export interface Item {
   instructions: string
 }
 
-// todo: get list from server
-const itemList: Item[] = [];
-
 @Injectable()
 export class RecipesService {
+  private itemList;
+  private currentItem;
 
-  constructor() {
+  constructor(private af: AngularFire) {
+    this.itemList = this.af.database.list('/recipeList');
   }
 
   getList() {
-    return itemList;
+    return this.itemList;
   }
 
-  saveItem(item: Item, existingItem) {
-    if (existingItem) {
-      itemList[itemList.indexOf(existingItem)] = item;
+  getItem(item) {
+    const itemObservable = this.af.database.object(`/recipes/${item.$key}`);
+    itemObservable.subscribe(recipe => this.currentItem = recipe);
+    return itemObservable;
+  }
+
+
+  saveItem(item: Item, currentItem) {
+    if (currentItem) {
+      return this.af.database.object(`/recipes/${currentItem.$key || currentItem.key}`)
+        .set(item)
+        .then(() => Object.assign(currentItem, item))
+        .catch(error => console.error(error));
     } else {
-      itemList.push(item);
+      return this.af.database.list(`/recipes`)
+        .push(item)
+        .then(savedItem => {
+          this.currentItem = savedItem.key;
+          return savedItem;
+        })
+        .catch(error => console.error(error));
     }
-    return item;
   }
 }

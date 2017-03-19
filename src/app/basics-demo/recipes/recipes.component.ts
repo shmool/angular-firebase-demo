@@ -11,8 +11,8 @@ import { FormBuilder, FormArray } from '@angular/forms';
     
     <div class="column left">
       <ul>
-        <li *ngFor="let item of itemList; let i = index" 
-            (click)="showItem(i)">
+        <li *ngFor="let item of itemList | async; let i = index" 
+            (click)="showItem(item)">
            {{ item.title }}
         </li>
       </ul>
@@ -52,7 +52,7 @@ import { FormBuilder, FormArray } from '@angular/forms';
 })
 export class RecipesComponent implements OnInit {
   itemList: Item[];
-  private displayedItem: Item;
+  private displayedItem;
   private readOnly = false;
   private recipeForm;
 
@@ -82,19 +82,22 @@ export class RecipesComponent implements OnInit {
     this.readOnly = false;
   }
 
-  showItem(index) {
-    this.displayedItem = this.itemList[index];
-    const ingredientFGs = this.displayedItem.ingredients.map(item => this.createIngredient(item));
-    this.recipeForm.controls.ingredients = this.formBuilder.array(ingredientFGs);
-    this.readOnly = true;
-    this.recipeForm.setValue(this.displayedItem);
+  showItem(item) {
+    return this.recipeService.getItem(item)
+      .subscribe((recipe) => {
+        this.displayedItem = recipe;
+        const ingredientFGs = recipe.ingredients.map(ingredient => this.createIngredient(ingredient));
+        this.recipeForm.controls.ingredients = this.formBuilder.array(ingredientFGs);
+        this.readOnly = true;
+        this.recipeForm.setValue(recipe);
+      });
   }
 
   edit() {
     this.readOnly = false;
   }
 
-  createIngredient(item = {name: '', quantity: ''}) {
+  createIngredient(item = { name: '', quantity: '' }) {
     return this.formBuilder.group(item)
   }
 
@@ -104,6 +107,13 @@ export class RecipesComponent implements OnInit {
   }
 
   save() {
+    const recipe = this._getDataFromForm();
+
+    this.recipeService.saveItem(recipe, this.displayedItem)
+      .then(savedItem => this.displayedItem = savedItem);
+  }
+
+  _getDataFromForm() {
     const formModel = this.recipeForm.value;
 
     const ingredientsDeepCopy = this.ingredients.map(
@@ -112,7 +122,7 @@ export class RecipesComponent implements OnInit {
 
     const recipe = formModel;
     recipe.ingredients = ingredientsDeepCopy;
-    this.displayedItem = this.recipeService.saveItem(recipe, this.displayedItem);
+    return recipe;
   }
 
 }
