@@ -8,6 +8,7 @@ import { NotificationsComponent } from './notifications/notifications.component'
 import { AuthService } from '../services/auth.service';
 import { RecipesComponent } from './recipes/recipes.component';
 import { RecipesService } from '../services/recipes.service';
+import { RecipeFormComponent } from './recipes/recipe-form/recipe-form.component';
 
 @NgModule({
   imports: [
@@ -19,7 +20,8 @@ import { RecipesService } from '../services/recipes.service';
     AuthComponent,
     UserDetailsComponent,
     NotificationsComponent,
-    RecipesComponent
+    RecipesComponent,
+    RecipeFormComponent
   ],
   providers: [
     AuthService,

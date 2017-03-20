@@ -43,7 +43,7 @@ export class RecipesService {
         .push(item)
         .then(savedItem => {
           this.currentItem = savedItem.key;
-          return savedItem;
+          return Object.assign(item, {$key: savedItem.key});
         })
         .catch(error => console.error(error));
     }
